@@ -11,63 +11,69 @@ namespace Escola.Repository
 {
     public class UsuarioRepository: IUsuarioRepository
     {
-        private readonly EscolaDbContext _context;
 
-        public UsuarioRepository(EscolaDbContext context)
+        private readonly EscolaDbContext _db;
+
+        public UsuarioRepository(EscolaDbContext escolaDbContext)
         {
-            _context = context;
+            _db = escolaDbContext;
         }
 
-        public async Task<Usuario> ObterPorEmailESenha(string email, string senha)
-        {
-            // Validação dos parâmetros
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                throw new ArgumentException("O email não pode ser vazio.", nameof(email));
-            }
 
-            if (string.IsNullOrWhiteSpace(senha))
-            {
-                throw new ArgumentException("A senha não pode ser vazia.", nameof(senha));
-            }
 
-            var usuario = await _context.Usuarios
-                .AsNoTracking() // Melhora performance para consultas somente leitura
-                .FirstOrDefaultAsync(u => u.Email == email && u.Senha == senha);
 
-            return usuario;
-        }
-
-        public async Task<Usuario> ObterPorEmail(string email)
-        {
-            // Validação do parâmetro
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                throw new ArgumentException("O email não pode ser vazio.", nameof(email));
-            }
-
-            var usuario = await _context.Usuarios
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == email);
-
-            return usuario;
-        }
 
         public async Task<Usuario> AdicionarUsuario(Usuario usuario)
         {
-            // Verifica se já existe um usuário com este email
-            var usuarioExistente = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Email == usuario.Email);
+            
+            var usuarioExiste = await _db.Usuarios.FirstOrDefaultAsync(a => a.Email == usuario.Email);
 
-            if (usuarioExistente != null)
+            if (usuarioExiste != null)
             {
-                throw new InvalidOperationException($"Já existe um usuário cadastrado com o email: {usuario.Email}");
+                throw new Exception("Usuário já existe com esse email.");
             }
 
-            await _context.Usuarios.AddAsync(usuario);
-            await _context.SaveChangesAsync();
+            
+
+            await _db.Usuarios.AddAsync(usuario);
+            
+            await _db.SaveChangesAsync();
 
             return usuario;
+
+
+
         }
+
+
+
+
+        public async Task<Usuario> ObterPorEmailESenha(string email, string senha)
+        {
+
+            var usuario = await _db.Usuarios.FirstOrDefaultAsync(u => u.Email == email && u.Senha == senha);
+
+
+          
+            return usuario;
+
+        }
+
+
+        public async Task<Usuario> ObterUsuario(string email)
+        {
+           
+
+            var usuario = await _db.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+
+
+
+            return usuario;
+
+        }
+
+
+
+
     }
 }

@@ -11,3 +11,6 @@ namespace Escola.Application.Interfaces
         Task AdicionarUsuario(string nome, string email, string senha);
     }
 }
+
+
+     

@@ -21,16 +21,29 @@ namespace Escola.Application.Services
         }
 
 
-        public async Task<UsuarioDTO> Autenticar(string email, string senha)
+        public async Task<UsuarioDTO> Autenticar(string email, string senha) 
         {
-            // Busca o usuário pelo email
-            var usuario = await _usuarioRepository.ObterPorEmail(email);
+            // Simulação de autenticação
 
-            // Verifica se o usuário existe e se a senha está correta usando BCrypt
-            if (usuario == null || !VerificarSenha(senha, usuario.Senha))
+
+            var usuario = await _usuarioRepository.ObterUsuario(email);
+
+
+            if (usuario == null)
             {
                 return new UsuarioDTO();
             }
+
+            var senhaValida = BCrypt.Net.BCrypt.Verify(senha, usuario.Senha);
+
+
+
+          
+            if (!senhaValida)
+            {
+                return new UsuarioDTO();
+            }
+            
 
             return new UsuarioDTO
             {
@@ -39,50 +52,7 @@ namespace Escola.Application.Services
             };
         }
 
-        /// <summary>
-        /// Gera um hash BCrypt da senha fornecida
-        /// </summary>
-        /// <param name="senha">Senha em texto plano</param>
-        /// <returns>Hash BCrypt da senha</returns>
-        public string GerarHashSenha(string senha)
-        {
-            if (string.IsNullOrWhiteSpace(senha))
-            {
-                throw new ArgumentException("A senha não pode ser vazia.", nameof(senha));
-            }
+       
 
-            // Gera o hash usando BCrypt com workFactor 12 (padrão recomendado)
-            return BCrypt.Net.BCrypt.HashPassword(senha, workFactor: 12);
-        }
-
-        /// <summary>
-        /// Verifica se a senha fornecida corresponde ao hash armazenado
-        /// </summary>
-        /// <param name="senha">Senha em texto plano</param>
-        /// <param name="hashArmazenado">Hash BCrypt armazenado no banco</param>
-        /// <returns>True se a senha corresponder ao hash, False caso contrário</returns>
-        public bool VerificarSenha(string senha, string hashArmazenado)
-        {
-            if (string.IsNullOrWhiteSpace(senha))
-            {
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(hashArmazenado))
-            {
-                return false;
-            }
-
-            try
-            {
-                return BCrypt.Net.BCrypt.Verify(senha, hashArmazenado);
-            }
-            catch
-            {
-                // Se houver erro na verificação (hash inválido), retorna false
-                return false;
-            }
-        }
     }
 }
-

@@ -9,11 +9,10 @@ using System.Threading.Tasks;
 
 namespace Escola.Application.Services
 {
-    public class UsuarioAppService : IUsuarioAppService
+    public class UsuarioAppService: IUsuarioAppService
     {
         private readonly IUsuarioRepository _usuarioRepository;
-        public UsuarioAppService(IUsuarioRepository usuarioRepository)
-        {
+        public UsuarioAppService(IUsuarioRepository usuarioRepository) {
 
             _usuarioRepository = usuarioRepository;
         }
@@ -37,9 +36,10 @@ namespace Escola.Application.Services
 
         public string GerarHashSenha(string senha)
         {
+            
+            var senhaCrypt = BCrypt.Net.BCrypt.HashPassword(senha);
 
-            return BCrypt.Net.BCrypt.HashPassword(senha);
-
+            return senhaCrypt;
 
 
 
