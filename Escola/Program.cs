@@ -16,14 +16,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configuração do DbContext com MySQL (Pomelo)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+//conexao com mysql
+var connectioString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EscolaDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseMySql(connectioString, ServerVersion.AutoDetect(connectioString)));
 
 builder.Services.AddScoped<IJwtAppService, JwtAppService>();
 builder.Services.AddScoped<IAutenticacaoAppService, AutenticacaoAppService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IUsuarioAppService, UsuarioAppService>();
 
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
